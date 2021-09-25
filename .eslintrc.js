@@ -17,6 +17,7 @@ module.exports = {
   plugins: [
     'react',
   ],
-  rules: {},
-  ignorePatterns: ['index.js'],
+  rules: {
+  },
+  ignorePatterns: ['/src/index.js'],
 };
