@@ -18,6 +18,8 @@ module.exports = {
     'react',
   ],
   rules: {
+    'no-tabs': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
   ignorePatterns: ['/src/index.js'],
 };
