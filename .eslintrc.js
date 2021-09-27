@@ -20,6 +20,9 @@ module.exports = {
   rules: {
     'no-tabs': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'eslint linebreak-style': [0, 'error', 'windows'],
+    'linebreak-style': 0,
+    'global-require': 0,
   },
   ignorePatterns: ['/src/index.js'],
 };

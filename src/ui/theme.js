@@ -16,4 +16,6 @@ export const COLOR_NEUTRAL_2 = '#CDC9C3';
 export const COLOR_NEUTRAL_3 = '#FBF7F0';
 export const COLOR_NEUTRAL_4 = '#D9E4DD';
 
+export const COLOR_SHADOWS = '#030508';
+
 export const FONT_FAMILY = 'Rubik, sans-serif';
