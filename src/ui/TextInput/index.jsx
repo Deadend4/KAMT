@@ -19,7 +19,7 @@ const TextInput = ({ label, width, ...props }) => (
 );
 
 TextInput.propTypes = {
-  label: PropTypes.string,
+  label: PropTypes.node,
   width: PropTypes.string,
 };
 
