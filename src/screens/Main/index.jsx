@@ -1,39 +1,26 @@
-import React, { useState, useRef, useCallback, memo } from 'react';
-import { Slider } from 'baseui/slider';
+import React, { useCallback, useState } from 'react';
+import Menu from '../../ui/Menu';
+import Configurator from '../Configurator';
+import { Container, Content } from './styles';
 import {
-  Container,
-  Title,
-  Block,
-  LeftColumn,
-  RightColumn,
-  Row,
-  GraphContainer,
-  PlateCell,
-  Plate,
-  BorderTitle,
-} from './styles';
-import TextInput from '../../ui/TextInput';
-import BorderFrame from '../../ui/BorderFrame';
-import { Checkbox } from 'baseui/checkbox';
-import { capitalizeFirstLetter, isNotNegative } from '../../utils';
-import {
-  INITIAL_TIME_RANGE,
-  INITIAL_PLATE_STATS,
   INITIAL_BORDERS,
-  INITIAL_SOURCE,
   INITIAL_PLATE_SIZE,
+  INITIAL_PLATE_STATS,
+  INITIAL_SOURCE,
+  INITIAL_TIME_RANGE,
 } from '../../initialParams';
+import { isNotNegative } from '../../utils';
 
 const Main = () => {
+  const [selectedTab, setSelectedTab] = useState('configurator');
   const [timeRange, setTimeRange] = useState([INITIAL_TIME_RANGE]);
   const [sources, setSources] = useState([INITIAL_SOURCE]);
-  const [plateSize, setPlateSize] = useState([INITIAL_PLATE_SIZE]);
+  const [plateSize, setPlateSize] = useState(INITIAL_PLATE_SIZE);
   const [plateStats, setPlateStats] = useState(INITIAL_PLATE_STATS);
   const [borders, setBorders] = useState(INITIAL_BORDERS);
-  const plate = useRef(new Array(plateSize[0] * plateSize[0]).fill(0));
 
   const handleReset = useCallback(() => {
-    setPlateSize([INITIAL_PLATE_SIZE]);
+    setPlateSize(INITIAL_PLATE_SIZE);
     setSources([INITIAL_SOURCE]);
     setBorders(INITIAL_BORDERS);
     setTimeRange([INITIAL_TIME_RANGE]);
@@ -42,61 +29,10 @@ const Main = () => {
 
   /* Plate */
 
-  const handlePlateSizeChange = useCallback(
-    (e) => {
-      const { value } = e;
-      setPlateSize(value);
-      plate.current = new Array(value * value).fill(0);
-      setSources([INITIAL_SOURCE]);
-    },
-    [handleReset, plate],
-  );
-
-  const setAdditionalSourcesInputs = useCallback(
-    (letter, id) => (
-      <TextInput
-        label={letter}
-        key={letter}
-        width="30%"
-        value={sources.find((s) => s.id === id)[letter]}
-        onChange={
-          letter === 't'
-            ? ({ target }) => handleSourceTemperatureChange(id, target.value)
-            : undefined
-        }
-        disabled={letter !== 't'}
-      />
-    ),
-    [sources],
-  );
-
-  const renderPlate = useCallback(
-    (_, index) => {
-      const y = Math.trunc(index / plateSize);
-      const x = index % plateSize;
-      const activeCell = sources.find((s) => s.x === x && s.y === y);
-      const onCellClick = () => {
-        if (!!activeCell) {
-          deleteSource(activeCell.id);
-        } else {
-          if (sources.length < plateSize / 5) {
-            handleAddNewSource(x, y, 10);
-          }
-        }
-      };
-      return (
-        <PlateCell
-          key={index}
-          $isActive={!!activeCell}
-          $temperature={activeCell?.t}
-          onClick={onCellClick}
-        >
-          {!!activeCell && activeCell.t}
-        </PlateCell>
-      );
-    },
-    [sources],
-  );
+  const handlePlateSizeChange = useCallback((value) => {
+    setPlateSize(value[0]);
+    setSources([INITIAL_SOURCE]);
+  }, []);
 
   /* Sources */
 
@@ -144,31 +80,6 @@ const Main = () => {
     [borders],
   );
 
-  const setBorderInputs = useCallback(
-    (border) => {
-      return (
-        <TextInput
-          label={
-            <BorderTitle>
-              {capitalizeFirstLetter(border)}, t°{' '}
-              <Checkbox
-                checked={borders[border].isActive}
-                onChange={() => handleBorderClick(border)}
-              />
-            </BorderTitle>
-          }
-          value={borders[border].temperature}
-          width="24%"
-          disabled={!borders[border].isActive}
-          onChange={({ target }) =>
-            handleBorderTemperatureChange(border, target.value)
-          }
-        />
-      );
-    },
-    [borders],
-  );
-
   const handleBorderClick = useCallback(
     (border) => {
       setBorders({
@@ -208,68 +119,46 @@ const Main = () => {
     [plateStats],
   );
 
+  const getContent = () => {
+    switch (selectedTab) {
+      case 'configurator':
+        return (
+          <Configurator
+            plateSize={plateSize}
+            borders={borders}
+            sources={sources}
+            onBorderClick={handleBorderClick}
+            onActiveCellClick={deleteSource}
+            onBorderTemperatureChange={handleBorderTemperatureChange}
+            onInactiveCellClick={handleAddNewSource}
+            onPlateSizeChange={handlePlateSizeChange}
+            onSourceTemperatureChange={handleSourceTemperatureChange}
+            onStatsChange={handleStatsChange}
+            onTimeRangeChange={handleTimeRangeChange}
+            plateStats={plateStats}
+            timeRange={timeRange}
+          />
+        );
+      case 'chart':
+        return (
+          <iframe
+            width="1600"
+            height="900"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        );
+    }
+  };
   return (
     <Container>
-      <LeftColumn>
-        <Block>
-          <Title>Размер пластины (у. е.)</Title>
-          <Slider
-            value={plateSize}
-            onChange={handlePlateSizeChange}
-            min={5}
-            max={40}
-          />
-          <Title>Отрезок времени (сек)</Title>
-          <Slider
-            value={timeRange}
-            onChange={handleTimeRangeChange}
-            min={1}
-            max={60}
-          />
-          <Title>Характеристики пластины</Title>
-          <Row>
-            <TextInput
-              label="c"
-              width="48%"
-              placeholder={plateStats.c}
-              value={plateStats.c}
-              onChange={handleStatsChange('c')}
-            />
-            <TextInput
-              label="p"
-              width="48%"
-              value={plateStats.p}
-              placeholder={plateStats.p}
-              onChange={handleStatsChange('p')}
-            />
-          </Row>
-          <Title>Границы</Title>
-          <Row>{['top', 'right', 'bottom', 'left'].map(setBorderInputs)}</Row>
-          <Title>Источники тепла</Title>
-          {sources.map((item) => (
-            <Row key={item.id} id={`source-x-y`}>
-              {['x', 'y', 't'].map((key) =>
-                setAdditionalSourcesInputs(key, item.id),
-              )}
-            </Row>
-          ))}
-        </Block>
-      </LeftColumn>
-      <RightColumn>
-        <GraphContainer>
-          <BorderFrame
-            plateSize={plateSize[0]}
-            onBorderClick={handleBorderClick}
-            borders={borders}
-          >
-            <Plate $size={plateSize[0]}>
-              {plate.current?.map(renderPlate)}
-            </Plate>
-          </BorderFrame>
-        </GraphContainer>
-      </RightColumn>
+      <Menu selectedItem={selectedTab} onMenuItemClick={setSelectedTab} />
+      <Content>{getContent()}</Content>
     </Container>
   );
 };
 
-export default memo(Main);
+export default Main;
