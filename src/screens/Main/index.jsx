@@ -8,8 +8,10 @@ import {
   INITIAL_PLATE_STATS,
   INITIAL_SOURCE,
   INITIAL_TIME_RANGE,
+  TEST_GRID,
 } from '../../initialParams';
 import { isNotNegative } from '../../utils';
+import Chart from '../Chart';
 
 const Main = () => {
   const [selectedTab, setSelectedTab] = useState('configurator');
@@ -140,17 +142,7 @@ const Main = () => {
           />
         );
       case 'chart':
-        return (
-          <iframe
-            width="1600"
-            height="900"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        );
+        return <Chart width={600} height={600} grid={TEST_GRID} size={7} />;
     }
   };
   return (
