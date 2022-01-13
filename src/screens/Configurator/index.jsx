@@ -38,7 +38,7 @@ const Configurator = ({
   const handlePlateSizeChange = useCallback(({ value }) => {
     onPlateSizeChange(value);
     setPlate(new Array(value * value).fill(0));
-  });
+  }, []);
 
   const setAdditionalSourcesInputs = useCallback(
     (letter, id) => (
@@ -99,6 +99,7 @@ const Configurator = ({
               />
             </BorderTitle>
           }
+          key={`${border}-key`}
           value={borders[border].temperature}
           width="24%"
           disabled={!borders[border].isActive}
@@ -200,11 +201,11 @@ Configurator.propTypes = {
       temperature: PropTypes.number,
     }),
   }),
-  timeRange: PropTypes.number,
+  timeRange: PropTypes.arrayOf(PropTypes.number),
   onActiveCellClick: PropTypes.func,
   onInactiveCellClick: PropTypes.func,
   onSourceTemperatureChange: PropTypes.func,
-  plateStats: PropTypes.func,
+  plateStats: PropTypes.object,
   onBorderClick: PropTypes.func,
   onBorderTemperatureChange: PropTypes.func,
   onPlateSizeChange: PropTypes.func,

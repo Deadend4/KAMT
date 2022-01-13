@@ -24,7 +24,7 @@ const Menu = ({ onMenuItemClick, selectedItem }) => {
 
 Menu.propTypes = {
   onMenuItemClick: PropTypes.func,
-  selectedItem: PropTypes.oneOf(['configurator, chart']),
+  selectedItem: PropTypes.oneOf(['configurator', 'chart']),
 };
 
 export default Menu;

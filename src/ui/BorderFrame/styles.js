@@ -6,7 +6,6 @@ export const Frame = styled('div', (props) => {
     width: `${props.$size * 20 + 2 * props.$size}px`,
     height: `${props.$size * 20 + 2 * props.$size}px`,
     minHeight: `${props.$size * 20 + 2 * props.$size}px`,
-    marginTop: '44px',
   };
 });
 
