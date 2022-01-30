@@ -8,18 +8,17 @@ import {
   INITIAL_PLATE_STATS,
   INITIAL_SOURCE,
   INITIAL_TIME_RANGE,
-  TEST_GRID,
 } from '../../initialParams';
 import { isNotNegative } from '../../utils';
-import Chart from '../Chart';
 
 const Main = () => {
   const [selectedTab, setSelectedTab] = useState('configurator');
-  const [timeRange, setTimeRange] = useState([INITIAL_TIME_RANGE]);
+  const [timeRange, setTimeRange] = useState([0, INITIAL_TIME_RANGE]);
   const [sources, setSources] = useState([INITIAL_SOURCE]);
   const [plateSize, setPlateSize] = useState(INITIAL_PLATE_SIZE);
   const [plateStats, setPlateStats] = useState(INITIAL_PLATE_STATS);
   const [borders, setBorders] = useState(INITIAL_BORDERS);
+  const [calculationMode, setCalculationMode] = useState('quasilinear');
 
   const handleReset = useCallback(() => {
     setPlateSize(INITIAL_PLATE_SIZE);
@@ -121,6 +120,10 @@ const Main = () => {
     [plateStats],
   );
 
+  const handleCalculationModeChange = useCallback((e) => {
+    setCalculationMode(e.currentTarget.value);
+  }, []);
+
   const getContent = () => {
     switch (selectedTab) {
       case 'configurator':
@@ -139,15 +142,14 @@ const Main = () => {
             onTimeRangeChange={handleTimeRangeChange}
             plateStats={plateStats}
             timeRange={timeRange}
+            calculationMode={calculationMode}
+            onCalculationModeChange={handleCalculationModeChange}
           />
         );
-      case 'chart':
-        return <Chart width={600} height={600} grid={TEST_GRID} size={7} />;
     }
   };
   return (
     <Container>
-      <Menu selectedItem={selectedTab} onMenuItemClick={setSelectedTab} />
       <Content>{getContent()}</Content>
     </Container>
   );
