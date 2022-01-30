@@ -1,4 +1,6 @@
 import React, { useCallback, useState } from 'react';
+import { Checkbox } from 'baseui/checkbox';
+import { Radio, RadioGroup } from 'baseui/radio';
 import { Slider } from 'baseui/slider';
 import * as PropTypes from 'prop-types';
 import {
@@ -15,7 +17,6 @@ import {
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
-import { Checkbox } from 'baseui/checkbox';
 import { capitalizeFirstLetter } from '../../utils';
 
 const Configurator = ({
@@ -32,13 +33,18 @@ const Configurator = ({
   onPlateSizeChange,
   onTimeRangeChange,
   onStatsChange,
+  calculationMode,
+  onCalculationModeChange,
 }) => {
   const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
 
-  const handlePlateSizeChange = useCallback(({ value }) => {
-    onPlateSizeChange(value);
-    setPlate(new Array(value * value).fill(0));
-  }, []);
+  const handlePlateSizeChange = useCallback(
+    ({ value }) => {
+      onPlateSizeChange(value);
+      setPlate(new Array(value * value).fill(0));
+    },
+    [onPlateSizeChange],
+  );
 
   const setAdditionalSourcesInputs = useCallback(
     (letter, id) => (
@@ -55,7 +61,7 @@ const Configurator = ({
         disabled={letter !== 't'}
       />
     ),
-    [sources],
+    [sources, onSourceTemperatureChange],
   );
 
   const renderPlate = useCallback(
@@ -83,7 +89,7 @@ const Configurator = ({
         </PlateCell>
       );
     },
-    [sources],
+    [sources, plateSize, onActiveCellClick, onInactiveCellClick],
   );
 
   const setBorderInputs = useCallback(
@@ -95,7 +101,7 @@ const Configurator = ({
               {capitalizeFirstLetter(border)}, t°{' '}
               <Checkbox
                 checked={borders[border].isActive}
-                onChange={() => onBorderClick(border)}
+                onChange={onBorderClick.bind(this, border)}
               />
             </BorderTitle>
           }
@@ -109,7 +115,7 @@ const Configurator = ({
         />
       );
     },
-    [borders],
+    [borders, onBorderClick, onBorderTemperatureChange],
   );
 
   return (
@@ -127,9 +133,22 @@ const Configurator = ({
           <Slider
             value={timeRange}
             onChange={onTimeRangeChange}
-            min={1}
+            min={0}
             max={60}
           />
+          <Block>
+            <Title>Режим вычислений</Title>
+            <RadioGroup
+              value={calculationMode}
+              onChange={onCalculationModeChange}
+            >
+              <Radio value="quasilinear">Квазилинейная задача</Radio>
+              <Radio value="endothermic">
+                С учётом эндотермических эффектов
+              </Radio>
+            </RadioGroup>
+          </Block>
+
           <Title>Характеристики пластины</Title>
           <Row>
             <TextInput
@@ -202,10 +221,14 @@ Configurator.propTypes = {
     }),
   }),
   timeRange: PropTypes.arrayOf(PropTypes.number),
+  plateStats: PropTypes.shape({
+    c: PropTypes.number,
+    p: PropTypes.number,
+  }),
+  calculationMode: PropTypes.oneOf(['quasilinear', 'endothermic']),
   onActiveCellClick: PropTypes.func,
   onInactiveCellClick: PropTypes.func,
   onSourceTemperatureChange: PropTypes.func,
-  plateStats: PropTypes.object,
   onBorderClick: PropTypes.func,
   onBorderTemperatureChange: PropTypes.func,
   onPlateSizeChange: PropTypes.func,
