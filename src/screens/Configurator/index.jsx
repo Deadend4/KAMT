@@ -36,6 +36,8 @@ const Configurator = ({
   onStatsChange,
   calculationMode,
   onCalculationModeChange,
+  homogeneity,
+  onHomogeneityChange
 }) => {
   const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
 
@@ -137,8 +139,8 @@ const Configurator = ({
             min={0}
             max={60}
           />
+          <Title>Режим вычислений</Title>
           <Block>
-            <Title>Режим вычислений</Title>
             <RadioGroup
               value={calculationMode}
               onChange={onCalculationModeChange}
@@ -149,7 +151,16 @@ const Configurator = ({
               </Radio>
             </RadioGroup>
           </Block>
-
+          <Title>Однородность пластины</Title>
+          <Block>
+            <RadioGroup
+              value={homogeneity}
+              onChange={onHomogeneityChange}
+            >
+              <Radio value="homogeneity">Однородная</Radio>
+              <Radio value="heterogeneity">Неоднородная</Radio>
+            </RadioGroup>
+          </Block>
           <Title>Характеристики пластины</Title>
           <Row>
             <TextInput
@@ -236,6 +247,8 @@ Configurator.propTypes = {
     c: PropTypes.number,
     p: PropTypes.number,
   }),
+  homogeneity: PropTypes.string,
+  onHomogeneityChange: PropTypes.func,
   calculationMode: PropTypes.oneOf(['quasilinear', 'endothermic']),
   onActiveCellClick: PropTypes.func,
   onInactiveCellClick: PropTypes.func,

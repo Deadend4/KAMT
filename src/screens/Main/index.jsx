@@ -19,6 +19,7 @@ const Main = () => {
   const [plateStats, setPlateStats] = useState(INITIAL_PLATE_STATS);
   const [borders, setBorders] = useState(INITIAL_BORDERS);
   const [calculationMode, setCalculationMode] = useState('quasilinear');
+  const [homogeneity, setHomogeneity] = useState("homogeneity");
 
   const handleReset = useCallback(() => {
     setPlateSize(INITIAL_PLATE_SIZE);
@@ -124,6 +125,9 @@ const Main = () => {
     setCalculationMode(e.currentTarget.value);
   }, []);
 
+  const handleHomogeneityChange = useCallback((e) => {
+    setHomogeneity(e.currentTarget.value);
+  }, []);
   const getContent = () => {
     switch (selectedTab) {
       case 'configurator':
@@ -144,6 +148,8 @@ const Main = () => {
             timeRange={timeRange}
             calculationMode={calculationMode}
             onCalculationModeChange={handleCalculationModeChange}
+            homogeneity={homogeneity}
+            onHomogeneityChange={handleHomogeneityChange}
           />
         );
     }
