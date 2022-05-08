@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Checkbox } from 'baseui/checkbox';
 import { Radio, RadioGroup } from 'baseui/radio';
 import { Slider } from 'baseui/slider';
+import { Button } from 'baseui/button'
 import * as PropTypes from 'prop-types';
 import {
   Container,
@@ -17,7 +18,7 @@ import {
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
-import { capitalizeFirstLetter } from '../../utils';
+import { capitalizeFirstLetter, changeCores } from '../../utils';
 
 const Configurator = ({
   sources,
@@ -176,6 +177,16 @@ const Configurator = ({
               )}
             </Row>
           ))}
+        </Block>
+        <Block>
+          <Button onClick={changeCores.bind(this, {
+            sources,
+            plateSize,
+            borders,
+            timeRange,
+            plateStats,
+            calculationMode
+          })}>Start</Button>
         </Block>
       </LeftColumn>
       <RightColumn>
