@@ -98,6 +98,8 @@ export const PlateCell = styled('div', (props) => {
 
 export const Title = styled('h2', {});
 
+export const SubTitle = styled('h3', {});
+
 export const BorderTitle = styled('span', {
   display: 'flex',
   alignItems: 'center',

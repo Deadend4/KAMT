@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Checkbox } from 'baseui/checkbox';
 import { Radio, RadioGroup } from 'baseui/radio';
 import { Slider } from 'baseui/slider';
-import { Button } from 'baseui/button'
+import { Button } from 'baseui/button';
 import * as PropTypes from 'prop-types';
 import {
   Container,
@@ -15,6 +15,7 @@ import {
   PlateCell,
   Plate,
   BorderTitle,
+  SubTitle,
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
@@ -37,10 +38,9 @@ const Configurator = ({
   calculationMode,
   onCalculationModeChange,
   homogeneity,
-  onHomogeneityChange
+  onHomogeneityChange,
 }) => {
   const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
-
   const handlePlateSizeChange = useCallback(
     ({ value }) => {
       onPlateSizeChange(value);
@@ -69,8 +69,8 @@ const Configurator = ({
 
   const renderPlate = useCallback(
     (_, index) => {
-      const y = Math.trunc(index / plateSize);
-      const x = index % plateSize;
+      const x = Math.trunc(index / plateSize);
+      const y = index % plateSize;
       const activeCell = sources.find((s) => s.x === x && s.y === y);
       const onCellClick = () => {
         if (!!activeCell) {
@@ -153,15 +153,13 @@ const Configurator = ({
           </Block>
           <Title>Однородность пластины</Title>
           <Block>
-            <RadioGroup
-              value={homogeneity}
-              onChange={onHomogeneityChange}
-            >
+            <RadioGroup value={homogeneity} onChange={onHomogeneityChange}>
               <Radio value="homogeneity">Однородная</Radio>
               <Radio value="heterogeneity">Неоднородная</Radio>
             </RadioGroup>
           </Block>
           <Title>Характеристики пластины</Title>
+          {homogeneity === 'heterogeneity' && <SubTitle>Пластина 1</SubTitle>}
           <Row>
             <TextInput
               label="c"
@@ -178,6 +176,27 @@ const Configurator = ({
               onChange={onStatsChange('p')}
             />
           </Row>
+          {homogeneity === 'heterogeneity' && (
+            <>
+              <SubTitle>Пластина 2</SubTitle>
+              <Row>
+                <TextInput
+                  label="c"
+                  width="48%"
+                  placeholder={plateStats.c}
+                  value={plateStats.c}
+                  onChange={onStatsChange('c')}
+                />
+                <TextInput
+                  label="p"
+                  width="48%"
+                  value={plateStats.p}
+                  placeholder={plateStats.p}
+                  onChange={onStatsChange('p')}
+                />
+              </Row>
+            </>
+          )}
           <Title>Границы</Title>
           <Row>{['top', 'right', 'bottom', 'left'].map(setBorderInputs)}</Row>
           <Title>Источники тепла</Title>
@@ -190,14 +209,18 @@ const Configurator = ({
           ))}
         </Block>
         <Block>
-          <Button onClick={changeCores.bind(this, {
-            sources,
-            plateSize,
-            borders,
-            timeRange,
-            plateStats,
-            calculationMode
-          })}>Start</Button>
+          <Button
+            onClick={changeCores.bind(this, {
+              sources,
+              plateSize,
+              borders,
+              timeRange,
+              plateStats,
+              calculationMode,
+            })}
+          >
+            Start
+          </Button>
         </Block>
       </LeftColumn>
       <RightColumn>
@@ -244,8 +267,14 @@ Configurator.propTypes = {
   }),
   timeRange: PropTypes.arrayOf(PropTypes.number),
   plateStats: PropTypes.shape({
-    c: PropTypes.number,
-    p: PropTypes.number,
+    plate1: PropTypes.shape({
+      c: PropTypes.number,
+      p: PropTypes.number,
+    }),
+    plate2: PropTypes.shape({
+      c: PropTypes.number,
+      p: PropTypes.number,
+    }),
   }),
   homogeneity: PropTypes.string,
   onHomogeneityChange: PropTypes.func,

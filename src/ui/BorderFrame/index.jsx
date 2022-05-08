@@ -75,12 +75,4 @@ BorderFrame.propTypes = {
   }),
 };
 
-BorderFrame.defaultProps = {
-  left: false,
-  right: false,
-  top: false,
-  bottom: false,
-  children: null,
-};
-
 export default BorderFrame;
