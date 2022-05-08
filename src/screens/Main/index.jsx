@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import Menu from '../../ui/Menu';
 import Configurator from '../Configurator';
 import { Container, Content } from './styles';
 import {
@@ -12,28 +11,21 @@ import {
 import { isNotNegative } from '../../utils';
 
 const Main = () => {
-  const [selectedTab, setSelectedTab] = useState('configurator');
   const [timeRange, setTimeRange] = useState([0, INITIAL_TIME_RANGE]);
   const [sources, setSources] = useState([INITIAL_SOURCE]);
   const [plateSize, setPlateSize] = useState(INITIAL_PLATE_SIZE);
+  const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
   const [plateStats, setPlateStats] = useState(INITIAL_PLATE_STATS);
   const [borders, setBorders] = useState(INITIAL_BORDERS);
   const [calculationMode, setCalculationMode] = useState('quasilinear');
-  const [homogeneity, setHomogeneity] = useState("homogeneity");
-
-  const handleReset = useCallback(() => {
-    setPlateSize(INITIAL_PLATE_SIZE);
-    setSources([INITIAL_SOURCE]);
-    setBorders(INITIAL_BORDERS);
-    setTimeRange([INITIAL_TIME_RANGE]);
-    setPlateStats(INITIAL_PLATE_STATS);
-  }, []);
+  const [homogeneity, setHomogeneity] = useState('homogeneity');
 
   /* Plate */
-
-  const handlePlateSizeChange = useCallback((value) => {
-    setPlateSize(value[0]);
+  const handlePlateSizeChange = useCallback(({ value }) => {
+    const [val] = value;
+    setPlateSize(val);
     setSources([INITIAL_SOURCE]);
+    setPlate(new Array(val * val).fill(0));
   }, []);
 
   /* Sources */
@@ -109,50 +101,74 @@ const Main = () => {
   /* Stats */
 
   const handleStatsChange = useCallback(
-    (stat) =>
+    (plate, stat) =>
       ({ target }) => {
         if (isNotNegative(target.value)) {
           setPlateStats({
             ...plateStats,
-            [stat]: target.value,
+            ...plateStats,
+            [plate]: {
+              ...plateStats[plate],
+              [stat]: +target.value,
+            },
           });
         }
       },
     [plateStats],
   );
-
   const handleCalculationModeChange = useCallback((e) => {
     setCalculationMode(e.currentTarget.value);
   }, []);
 
-  const handleHomogeneityChange = useCallback((e) => {
-    setHomogeneity(e.currentTarget.value);
+  const handleHomogeneityChange = useCallback(
+    (e) => {
+      setHomogeneity(e.currentTarget.value);
+      setPlateStats({
+        ...plateStats,
+        plate2:
+          e.currentTarget.value === 'homogeneity'
+            ? null
+            : {
+                ...INITIAL_PLATE_STATS.plate1,
+              },
+      });
+    },
+    [plateStats],
+  );
+
+  const handleReset = useCallback(() => {
+    setTimeRange([INITIAL_TIME_RANGE]);
+    handlePlateSizeChange?.({ value: [INITIAL_PLATE_SIZE] });
+    setPlateStats(INITIAL_PLATE_STATS);
+    setBorders(INITIAL_BORDERS);
+    setCalculationMode('quasilinear');
+    setHomogeneity('homogeneity');
   }, []);
+
   const getContent = () => {
-    switch (selectedTab) {
-      case 'configurator':
-        return (
-          <Configurator
-            plateSize={plateSize}
-            borders={borders}
-            sources={sources}
-            onBorderClick={handleBorderClick}
-            onActiveCellClick={deleteSource}
-            onBorderTemperatureChange={handleBorderTemperatureChange}
-            onInactiveCellClick={handleAddNewSource}
-            onPlateSizeChange={handlePlateSizeChange}
-            onSourceTemperatureChange={handleSourceTemperatureChange}
-            onStatsChange={handleStatsChange}
-            onTimeRangeChange={handleTimeRangeChange}
-            plateStats={plateStats}
-            timeRange={timeRange}
-            calculationMode={calculationMode}
-            onCalculationModeChange={handleCalculationModeChange}
-            homogeneity={homogeneity}
-            onHomogeneityChange={handleHomogeneityChange}
-          />
-        );
-    }
+    return (
+      <Configurator
+        plateSize={plateSize}
+        borders={borders}
+        sources={sources}
+        onBorderClick={handleBorderClick}
+        onActiveCellClick={deleteSource}
+        onBorderTemperatureChange={handleBorderTemperatureChange}
+        onInactiveCellClick={handleAddNewSource}
+        onPlateSizeChange={handlePlateSizeChange}
+        onSourceTemperatureChange={handleSourceTemperatureChange}
+        onStatsChange={handleStatsChange}
+        onTimeRangeChange={handleTimeRangeChange}
+        plateStats={plateStats}
+        timeRange={timeRange}
+        calculationMode={calculationMode}
+        onCalculationModeChange={handleCalculationModeChange}
+        homogeneity={homogeneity}
+        onHomogeneityChange={handleHomogeneityChange}
+        onResetPress={handleReset}
+        plate={plate}
+      />
+    );
   };
   return (
     <Container>

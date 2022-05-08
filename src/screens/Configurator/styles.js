@@ -6,6 +6,7 @@ import {
   TEMPERATURE_3,
   TEMPERATURE_4,
 } from '../../ui/theme';
+import { Button } from 'baseui/button';
 
 const getPlateColor = (temp) => {
   if (temp <= 0) {
@@ -36,6 +37,7 @@ export const LeftColumn = styled('div', {
   borderColor: 'black',
   overflowY: 'auto',
   overflowX: 'hidden',
+  paddingBottom: '15px',
 });
 
 export const Block = styled('div', {
@@ -94,6 +96,19 @@ export const PlateCell = styled('div', (props) => {
       backgroundColor: '#810f0f',
     },
   };
+});
+
+export const ButtonsRow = styled(Row, {
+  padding: '0 10px',
+  width: 'auto',
+});
+
+export const StartButton = styled(Button, {
+  width: '46%',
+});
+
+export const ResetButton = styled(StartButton, {
+  backgroundColor: '#7c0909',
 });
 
 export const Title = styled('h2', {});
