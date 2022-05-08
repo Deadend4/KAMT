@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Checkbox } from 'baseui/checkbox';
 import { Radio, RadioGroup } from 'baseui/radio';
 import { Slider } from 'baseui/slider';
-import { Button } from 'baseui/button'
 import * as PropTypes from 'prop-types';
 import {
   Container,
@@ -15,6 +14,10 @@ import {
   PlateCell,
   Plate,
   BorderTitle,
+  SubTitle,
+  StartButton,
+  ResetButton,
+  ButtonsRow,
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
@@ -36,17 +39,11 @@ const Configurator = ({
   onStatsChange,
   calculationMode,
   onCalculationModeChange,
+  homogeneity,
+  onHomogeneityChange,
+  onResetPress,
+  plate,
 }) => {
-  const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
-
-  const handlePlateSizeChange = useCallback(
-    ({ value }) => {
-      onPlateSizeChange(value);
-      setPlate(new Array(value * value).fill(0));
-    },
-    [onPlateSizeChange],
-  );
-
   const setAdditionalSourcesInputs = useCallback(
     (letter, id) => (
       <TextInput
@@ -67,8 +64,8 @@ const Configurator = ({
 
   const renderPlate = useCallback(
     (_, index) => {
-      const y = Math.trunc(index / plateSize);
-      const x = index % plateSize;
+      const x = Math.trunc(index / plateSize);
+      const y = index % plateSize;
       const activeCell = sources.find((s) => s.x === x && s.y === y);
       const onCellClick = () => {
         if (!!activeCell) {
@@ -119,6 +116,26 @@ const Configurator = ({
     [borders, onBorderClick, onBorderTemperatureChange],
   );
 
+  const handleStartPress = useCallback(() => {
+    changeCores({
+      sources,
+      plateSize,
+      borders,
+      timeRange,
+      plateStats,
+      calculationMode,
+      homogeneity,
+    });
+  }, [
+    sources,
+    plateSize,
+    borders,
+    timeRange,
+    plateStats,
+    calculationMode,
+    homogeneity,
+  ]);
+
   return (
     <Container>
       <LeftColumn>
@@ -126,7 +143,7 @@ const Configurator = ({
           <Title>Размер пластины (у. е.)</Title>
           <Slider
             value={[plateSize]}
-            onChange={handlePlateSizeChange}
+            onChange={onPlateSizeChange}
             min={5}
             max={40}
           />
@@ -137,8 +154,8 @@ const Configurator = ({
             min={0}
             max={60}
           />
+          <Title>Режим вычислений</Title>
           <Block>
-            <Title>Режим вычислений</Title>
             <RadioGroup
               value={calculationMode}
               onChange={onCalculationModeChange}
@@ -149,24 +166,52 @@ const Configurator = ({
               </Radio>
             </RadioGroup>
           </Block>
-
+          <Title>Однородность пластины</Title>
+          <Block>
+            <RadioGroup value={homogeneity} onChange={onHomogeneityChange}>
+              <Radio value="homogeneity">Однородная</Radio>
+              <Radio value="heterogeneity">Неоднородная</Radio>
+            </RadioGroup>
+          </Block>
           <Title>Характеристики пластины</Title>
+          {homogeneity === 'heterogeneity' && <SubTitle>Пластина 1</SubTitle>}
           <Row>
             <TextInput
               label="c"
               width="48%"
-              placeholder={plateStats.c}
-              value={plateStats.c}
-              onChange={onStatsChange('c')}
+              placeholder={plateStats.plate1.c}
+              value={plateStats.plate1.c}
+              onChange={onStatsChange('plate1', 'c')}
             />
             <TextInput
               label="p"
               width="48%"
-              value={plateStats.p}
-              placeholder={plateStats.p}
-              onChange={onStatsChange('p')}
+              value={plateStats.plate1.p}
+              placeholder={plateStats.plate1.p}
+              onChange={onStatsChange('plate1', 'p')}
             />
           </Row>
+          {homogeneity === 'heterogeneity' && (
+            <>
+              <SubTitle>Пластина 2</SubTitle>
+              <Row>
+                <TextInput
+                  label="c"
+                  width="48%"
+                  placeholder={plateStats.plate2?.c}
+                  value={plateStats.plate2?.c}
+                  onChange={onStatsChange('plate2', 'c')}
+                />
+                <TextInput
+                  label="p"
+                  width="48%"
+                  value={plateStats.plate2?.p}
+                  placeholder={plateStats.plate2?.p}
+                  onChange={onStatsChange('plate2', 'p')}
+                />
+              </Row>
+            </>
+          )}
           <Title>Границы</Title>
           <Row>{['top', 'right', 'bottom', 'left'].map(setBorderInputs)}</Row>
           <Title>Источники тепла</Title>
@@ -178,16 +223,10 @@ const Configurator = ({
             </Row>
           ))}
         </Block>
-        <Block>
-          <Button onClick={changeCores.bind(this, {
-            sources,
-            plateSize,
-            borders,
-            timeRange,
-            plateStats,
-            calculationMode
-          })}>Start</Button>
-        </Block>
+        <ButtonsRow>
+          <StartButton onClick={handleStartPress}>Start</StartButton>
+          <ResetButton onClick={onResetPress}>Reset</ResetButton>
+        </ButtonsRow>
       </LeftColumn>
       <RightColumn>
         <GraphContainer>
@@ -212,6 +251,7 @@ Configurator.propTypes = {
       t: PropTypes.number,
     }),
   ),
+  plate: PropTypes.arrayOf(PropTypes.number),
   plateSize: PropTypes.number,
   borders: PropTypes.shape({
     left: PropTypes.shape({
@@ -233,9 +273,17 @@ Configurator.propTypes = {
   }),
   timeRange: PropTypes.arrayOf(PropTypes.number),
   plateStats: PropTypes.shape({
-    c: PropTypes.number,
-    p: PropTypes.number,
+    plate1: PropTypes.shape({
+      c: PropTypes.number,
+      p: PropTypes.number,
+    }),
+    plate2: PropTypes.shape({
+      c: PropTypes.number,
+      p: PropTypes.number,
+    }),
   }),
+  homogeneity: PropTypes.string,
+  onHomogeneityChange: PropTypes.func,
   calculationMode: PropTypes.oneOf(['quasilinear', 'endothermic']),
   onActiveCellClick: PropTypes.func,
   onInactiveCellClick: PropTypes.func,
@@ -245,6 +293,7 @@ Configurator.propTypes = {
   onPlateSizeChange: PropTypes.func,
   onTimeRangeChange: PropTypes.func,
   onStatsChange: PropTypes.func,
+  onResetPress: PropTypes.func,
 };
 
 export default Configurator;

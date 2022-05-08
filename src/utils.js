@@ -13,7 +13,7 @@ const calculationModeHandler = (temp, calculationMode) => {
   return calculationMode === 'quasilinear'
     ? mult
     : mult - gamma * Math.pow(temp, 3);
-}
+};
 
 export const changeCores = ({
   sources,
@@ -21,7 +21,8 @@ export const changeCores = ({
   borders,
   timeRange,
   plateStats,
-  calculationMode
+  calculationMode,
+  homogeneity,
 }) => {
   console.log({
     sources,
@@ -29,7 +30,7 @@ export const changeCores = ({
     borders,
     timeRange,
     plateStats,
-    calculationMode
-  })
+    calculationMode,
+  });
   const timeStep = 0.005;
-}
+};

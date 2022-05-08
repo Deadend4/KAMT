@@ -8,26 +8,29 @@ export const INITIAL_SOURCE = {
 };
 
 export const INITIAL_PLATE_STATS = {
-  p: 1500,
-  c: 1000,
+  plate1: {
+    p: 1500,
+    c: 1000,
+  },
+  plate2: null,
 };
 
 export const INITIAL_BORDERS = {
   left: {
     isActive: false,
-    temperature: null,
+    temperature: '',
   },
   right: {
     isActive: false,
-    temperature: null,
+    temperature: '',
   },
   top: {
     isActive: false,
-    temperature: null,
+    temperature: '',
   },
   bottom: {
     isActive: false,
-    temperature: null,
+    temperature: '',
   },
 };
 
