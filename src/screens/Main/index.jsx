@@ -12,11 +12,11 @@ import { isNotNegative } from '../../utils';
 
 const Main = () => {
   const [timeRange, setTimeRange] = useState([0, INITIAL_TIME_RANGE]);
-  const [sources, setSources] = useState([INITIAL_SOURCE]);
+  const [sources, setSources] = useState([{ ...INITIAL_SOURCE }]);
   const [plateSize, setPlateSize] = useState(INITIAL_PLATE_SIZE);
   const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
-  const [plateStats, setPlateStats] = useState(INITIAL_PLATE_STATS);
-  const [borders, setBorders] = useState(INITIAL_BORDERS);
+  const [plateStats, setPlateStats] = useState({ ...INITIAL_PLATE_STATS });
+  const [borders, setBorders] = useState({ ...INITIAL_BORDERS });
   const [calculationMode, setCalculationMode] = useState('quasilinear');
   const [homogeneity, setHomogeneity] = useState('homogeneity');
 
@@ -24,7 +24,7 @@ const Main = () => {
   const handlePlateSizeChange = useCallback(({ value }) => {
     const [val] = value;
     setPlateSize(val);
-    setSources([INITIAL_SOURCE]);
+    setSources([{ ...INITIAL_SOURCE }]);
     setPlate(new Array(val * val).fill(0));
   }, []);
 
