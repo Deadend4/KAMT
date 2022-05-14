@@ -18,6 +18,7 @@ import {
   StartButton,
   ResetButton,
   ButtonsRow,
+  AfterLinkButton,
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
@@ -225,9 +226,22 @@ const Configurator = ({
           <ResetButton onClick={onResetPress}>Reset</ResetButton>
         </ButtonsRow>
         {downloadLink && (
-          <a href="#" download={downloadLink} target="_blank">
-            DOWNLOAD FILE
-          </a>
+          <ButtonsRow>
+            <AfterLinkButton>
+              <a href="#" download={'#'} style={{ color: 'white' }}>
+                Скачать файл
+              </a>
+            </AfterLinkButton>
+            <AfterLinkButton>
+              <a
+                href="mycustproto:Vizualizer"
+                download={'#'}
+                style={{ color: 'white' }}
+              >
+                Визуализатор
+              </a>
+            </AfterLinkButton>
+          </ButtonsRow>
         )}
       </LeftColumn>
       <RightColumn>

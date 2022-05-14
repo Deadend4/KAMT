@@ -101,10 +101,16 @@ export const PlateCell = styled('div', (props) => {
 export const ButtonsRow = styled(Row, {
   padding: '0 10px',
   width: 'auto',
+  marginBottom: '10px',
 });
 
 export const StartButton = styled(Button, {
   width: '46%',
+});
+
+export const AfterLinkButton = styled(Button, {
+  width: '46%',
+  backgroundColor: '#5b5b5b',
 });
 
 export const ResetButton = styled(StartButton, {
