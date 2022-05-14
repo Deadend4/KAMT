@@ -18,7 +18,10 @@ import {
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
-import { capitalizeFirstLetter, changeCores } from '../../utils';
+import { capitalizeFirstLetter } from '../../utils';
+import createClient from '../../client'
+
+const client = createClient();
 
 const Configurator = ({
   sources,
@@ -38,6 +41,7 @@ const Configurator = ({
   onCalculationModeChange,
 }) => {
   const [plate, setPlate] = useState(new Array(plateSize * plateSize).fill(0));
+  const [downloadLink, setDownloadLink] = useState(null);
 
   const handlePlateSizeChange = useCallback(
     ({ value }) => {
@@ -67,8 +71,8 @@ const Configurator = ({
 
   const renderPlate = useCallback(
     (_, index) => {
-      const y = Math.trunc(index / plateSize);
-      const x = index % plateSize;
+      const x = Math.trunc(index / plateSize);
+      const y = index % plateSize;
       const activeCell = sources.find((s) => s.x === x && s.y === y);
       const onCellClick = () => {
         if (!!activeCell) {
@@ -93,6 +97,18 @@ const Configurator = ({
     [sources, plateSize, onActiveCellClick, onInactiveCellClick],
   );
 
+  const onStart = async () => {
+    const res = await client.calculate({
+      sources,
+      plateSize,
+      borders,
+      timeRange,
+      plateStats,
+      calculationMode
+    });
+    console.log(res.link)
+    setDownloadLink(res.link)
+  }
   const setBorderInputs = useCallback(
     (border) => {
       return (
@@ -179,15 +195,9 @@ const Configurator = ({
           ))}
         </Block>
         <Block>
-          <Button onClick={changeCores.bind(this, {
-            sources,
-            plateSize,
-            borders,
-            timeRange,
-            plateStats,
-            calculationMode
-          })}>Start</Button>
+          <Button onClick={onStart}>Start</Button>
         </Block>
+        {downloadLink && (<a href={downloadLink} download={true}>DOWNLOAD FILE</a>)}
       </LeftColumn>
       <RightColumn>
         <GraphContainer>
