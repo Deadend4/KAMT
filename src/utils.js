@@ -5,4 +5,3 @@ export function capitalizeFirstLetter(string) {
 export function isNotNegative(value) {
   return +value >= 0;
 };
-
