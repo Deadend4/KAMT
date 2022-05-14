@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Checkbox } from 'baseui/checkbox';
 import { Radio, RadioGroup } from 'baseui/radio';
 import { Slider } from 'baseui/slider';
@@ -21,7 +21,10 @@ import {
 } from './styles';
 import TextInput from '../../ui/TextInput';
 import BorderFrame from '../../ui/BorderFrame';
-import { capitalizeFirstLetter, changeCores } from '../../utils';
+import { capitalizeFirstLetter } from '../../utils';
+import createClient from '../../client'
+
+const client = createClient();
 
 const Configurator = ({
   sources,
@@ -44,6 +47,17 @@ const Configurator = ({
   onResetPress,
   plate,
 }) => {
+
+  const [downloadLink, setDownloadLink] = useState(null);
+
+  const handlePlateSizeChange = useCallback(
+    ({ value }) => {
+      onPlateSizeChange(value);
+      setPlate(new Array(value * value).fill(0));
+    },
+    [onPlateSizeChange],
+  );
+
   const setAdditionalSourcesInputs = useCallback(
     (letter, id) => (
       <TextInput
@@ -90,6 +104,19 @@ const Configurator = ({
     [sources, plateSize, onActiveCellClick, onInactiveCellClick],
   );
 
+  const onStart = async () => {
+    const res = await client.calculate({
+      sources,
+      plateSize,
+      borders,
+      timeRange,
+      plateStats,
+      calculationMode
+    });
+    console.log(res.link)
+    setDownloadLink(res.link)
+  }
+  
   const setBorderInputs = useCallback(
     (border) => {
       return (
@@ -115,26 +142,6 @@ const Configurator = ({
     },
     [borders, onBorderClick, onBorderTemperatureChange],
   );
-
-  const handleStartPress = useCallback(() => {
-    changeCores({
-      sources,
-      plateSize,
-      borders,
-      timeRange,
-      plateStats,
-      calculationMode,
-      homogeneity,
-    });
-  }, [
-    sources,
-    plateSize,
-    borders,
-    timeRange,
-    plateStats,
-    calculationMode,
-    homogeneity,
-  ]);
 
   return (
     <Container>
@@ -224,9 +231,10 @@ const Configurator = ({
           ))}
         </Block>
         <ButtonsRow>
-          <StartButton onClick={handleStartPress}>Start</StartButton>
+          <StartButton onClick={onStart}>Start</StartButton>
           <ResetButton onClick={onResetPress}>Reset</ResetButton>
         </ButtonsRow>
+        {downloadLink && (<a href={downloadLink} download={true}>DOWNLOAD FILE</a>)}
       </LeftColumn>
       <RightColumn>
         <GraphContainer>
